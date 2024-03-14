@@ -1,31 +1,27 @@
-; Program gwiazdki.asm
-; Wyœwietlanie znaków * w takt przerwañ zegarowych
-; Uruchomienie w trybie rzeczywistym procesora x86
-; lub na maszynie wirtualnej
-; zakoñczenie programu po naciœniêciu klawisza 'x'
-; asemblacja (MASM 4.0): masm gwiazdki.asm,,,;
-; konsolidacja (LINK 3.60): link gwiazdki.obj;
+; zakoÅ„czenie programu po naciÅ›niÄ™ciu klawisza 'x'
+; asemblacja (MASM 4.0): masm snake.asm,,,;
+; konsolidacja (LINK 3.60): link snake.obj;
 .386
 rozkazy SEGMENT use16
 
 ASSUME CS:rozkazy
 ;============================================================
-; procedura obs³ugi przerwania zegarowego
+; procedura obsÅ‚ugi przerwania zegarowego
 obsluga_zegara PROC
-	; przechowanie u¿ywanych rejestrów
+	; przechowanie uÅ¼ywanych rejestrÃ³w
 	push ax
 	push bx
 	push cx
 	push es
 
-	; wpisanie adresu pamiêci ekranu do rejestru ES - pamiêæ
-	; ekranu dla trybu tekstowego zaczyna siê od adresu B8000H,
-	; jednak do rejestru ES wpisujemy wartoœæ B800H,
-	; bo w trakcie obliczenia adresu procesor ka¿dorazowo mno¿y
-	; zawartoœæ rejestru ES przez 16
-	mov ax, 0B800h				; adres pamiêci ekranu
+	; wpisanie adresu pamiÄ™ci ekranu do rejestru ES - pamiÄ™Ä‡
+	; ekranu dla trybu tekstowego zaczyna siÄ™ od adresu B8000H,
+	; jednak do rejestru ES wpisujemy wartoÅ›Ä‡ B800H,
+	; bo w trakcie obliczenia adresu procesor kaÅ¼dorazowo mnoÅ¼y
+	; zawartoÅ›Ä‡ rejestru ES przez 16
+	mov ax, 0B800h				; adres pamiÄ™ci ekranu
 	mov es, ax
-	; zmienna 'licznik' zawiera adres bie¿¹cy w pamiêci ekranu
+	; zmienna 'licznik' zawiera adres bieÅ¼Ä…cy w pamiÄ™ci ekranu
 	mov bx, cs:licznik
 
 	cmp cs:kierunek, -2
@@ -51,7 +47,7 @@ nie_dol:
 	mov cl, '^'
 wyswietl:
 
-	mov ax, 0B800h				; adres pamiêci ekranu
+	mov ax, 0B800h				; adres pamiÄ™ci ekranu
 	mov es, ax
 	
 	push bx
@@ -64,39 +60,39 @@ wyswietl:
 	call wyswietl_AL
 	pop bx
 	
-	; przes³anie do pamiêci ekranu kodu ASCII wyœwietlanego znaku
-	; i kodu koloru: bia³y na czarnym tle (do nastêpnego bajtu)
+	; przesÅ‚anie do pamiÄ™ci ekranu kodu ASCII wyÅ›wietlanego znaku
+	; i kodu koloru: biaÅ‚y na czarnym tle (do nastÄ™pnego bajtu)
 	mov byte PTR es:[bx], cl			; kod ASCII
-	mov byte PTR es:[bx+1], 00001110B	; czarne t³o, ¿ó³ty znak
-	; zmiana adresu ekranu (pozycja g³owy wê¿a)
+	mov byte PTR es:[bx+1], 00001110B	; czarne tÅ‚o, Å¼Ã³Å‚ty znak
+	; zmiana adresu ekranu (pozycja gÅ‚owy wÄ™Å¼a)
 	add bx, cs:kierunek
 
 wysw_dalej:
-	;zapisanie adresu bie¿¹cego do zmiennej 'licznik'
+	;zapisanie adresu bieÅ¼Ä…cego do zmiennej 'licznik'
 	mov cs:licznik,bx
 
 koniec_obslugi:
-	; odtworzenie rejestrów
+	; odtworzenie rejestrÃ³w
 	pop es
 	pop bx
 	pop cx
 	pop ax
 
-	; skok do oryginalnej procedury obs³ugi przerwania zegarowego
+	; skok do oryginalnej procedury obsÅ‚ugi przerwania zegarowego
 	jmp dword PTR cs:wektor8
 	
-	; dane programu ze wzglêdu na specyfikê obs³ugi przerwañ
-	; umieszczone s¹ w segmencie kodu
-	licznik dw 320				; wyœwietlanie pocz¹wszy od 2. wiersza
+	; dane programu ze wzglÄ™du na specyfikÄ™ obsÅ‚ugi przerwaÅ„
+	; umieszczone sÄ… w segmencie kodu
+	licznik dw 320				; wyÅ›wietlanie poczÄ…wszy od 2. wiersza
 	wektor8 dd ?
-	kierunek dw	2				; lewo (-2) / prawo (+2) / dó³ (+160) / góra (-160)
+	kierunek dw	2				; lewo (-2) / prawo (+2) / dÃ³Å‚ (+160) / gÃ³ra (-160)
 	x db 0
 	y db 2
 
 obsluga_zegara ENDP
 ;============================================================
 obsluga_klawiatury PROC
-	; przechowanie u¿ywanych rejestrów
+	; przechowanie uÅ¼ywanych rejestrÃ³w
 	push ax
 	push bx
 	push es
@@ -130,60 +126,60 @@ nie_strzalka:
 	pop bx
 	pop ax
 
-	; skok do oryginalnej procedury obs³ugi przerwania zegarowego
+	; skok do oryginalnej procedury obsÅ‚ugi przerwania zegarowego
 	jmp dword PTR cs:wektor9
 
-	; dane programu ze wzglêdu na specyfikê obs³ugi przerwañ
-	; umieszczone s¹ w segmencie kodu
+	; dane programu ze wzglÄ™du na specyfikÄ™ obsÅ‚ugi przerwaÅ„
+	; umieszczone sÄ… w segmencie kodu
 	wektor9 dd ?
 
 obsluga_klawiatury ENDP
 ;============================================================
-; podprogram 'wyswietl_AL' wyœwietla zawartoœæ rejestru AL
-; w postaci liczby dziesiêtnej bez znaku
+; podprogram 'wyswietl_AL' wyÅ›wietla zawartoÅ›Ä‡ rejestru AL
+; w postaci liczby dziesiÄ™tnej bez znaku
 wyswietl_AL PROC
-	; wyœwietlanie zawartoœci rejestru AL na ekranie wg adresu
+	; wyÅ›wietlanie zawartoÅ›ci rejestru AL na ekranie wg adresu
 	; podanego w ES:BX
-	; stosowany jest bezpoœredni zapis do pamiêci ekranu
-	; przechowanie rejestrów
+	; stosowany jest bezpoÅ›redni zapis do pamiÄ™ci ekranu
+	; przechowanie rejestrÃ³w
 	push ax
 	push cx
 	push dx
 	
 	mov cl, 10			; dzielnik
-	mov ah, 0			; zerowanie starszej czêœci dzielnej
+	mov ah, 0			; zerowanie starszej czÄ™Å›ci dzielnej
 	
-	; dzielenie liczby w AX przez liczbê w CL, iloraz w AL,
+	; dzielenie liczby w AX przez liczbÄ™ w CL, iloraz w AL,
 	; reszta w AH (tu: dzielenie przez 10)
 	div cl
 	add ah, 30H			; zamiana na kod ASCII
-	mov es:[bx+4], ah	; cyfra jednoœci
+	mov es:[bx+4], ah	; cyfra jednoÅ›ci
 	
 	mov ah, 0
 	div cl				; drugie dzielenie przez 10
 	
 	add ah, 30H			; zamiana na kod ASCII
-	mov es:[bx+2], ah	; cyfra dziesi¹tek
+	mov es:[bx+2], ah	; cyfra dziesiÄ…tek
 	
 	add al, 30H			; zamiana na kod ASCII
 	mov es:[bx+0], al	; cyfra setek
 	
-	; wpisanie kodu koloru (intensywny bia³y) do pamiêci ekranu
+	; wpisanie kodu koloru (intensywny biaÅ‚y) do pamiÄ™ci ekranu
 	mov al, 00001111B
 	mov es:[bx+1],al
 	mov es:[bx+3],al
 	mov es:[bx+5],al
 	
-	; odtworzenie rejestrów
+	; odtworzenie rejestrÃ³w
 	pop dx
 	pop cx
 	pop ax
-	ret					; wyjœcie z podprogramu
+	ret					; wyjÅ›cie z podprogramu
 
 wyswietl_AL ENDP
 ;============================================================
-; program g³ówny - instalacja i deinstalacja procedury
-; obs³ugi przerwañ
+; program gÅ‚Ã³wny - instalacja i deinstalacja procedury
+; obsÅ‚ugi przerwaÅ„
 ; ustalenie strony nr 0 dla trybu tekstowego
 zacznij:
 	mov al, 0
@@ -193,39 +189,39 @@ zacznij:
 	mov ax, 0
 	mov ds,ax							; zerowanie rejestru DS
 
-	; odczytanie zawartoœci wektora nr 8 i zapisanie go
-	; w zmiennej 'wektor8' (wektor nr 8 zajmuje w pamiêci 4 bajty
-	; pocz¹wszy od adresu fizycznego 8 * 4 = 32)
+	; odczytanie zawartoÅ›ci wektora nr 8 i zapisanie go
+	; w zmiennej 'wektor8' (wektor nr 8 zajmuje w pamiÄ™ci 4 bajty
+	; poczÄ…wszy od adresu fizycznego 8 * 4 = 32)
 	mov eax,ds:[32]						; adres fizyczny 0*16 + 32 = 32
 	mov cs:wektor8, eax
 
 	; wpisanie do wektora nr 8 adresu procedury 'obsluga_klawiatury'
-	mov ax, SEG obsluga_zegara			; czêœæ segmentowa adresu
+	mov ax, SEG obsluga_zegara			; czÄ™Å›Ä‡ segmentowa adresu
 	mov bx, OFFSET obsluga_zegara		; offset adresu
-	cli									; zablokowanie przerwañ
+	cli									; zablokowanie przerwaÅ„
 
 	; zapisanie adresu procedury do wektora nr 8
 	mov ds:[32], bx						; OFFSET
 	mov ds:[34], ax						; cz. segmentowa
-	sti									;odblokowanie przerwañ
+	sti									;odblokowanie przerwaÅ„
 
-	; odczytanie zawartoœci wektora nr 9 i zapisanie go
-	; w zmiennej 'wektor9' (wektor nr 9 zajmuje w pamiêci 4 bajty
-	; pocz¹wszy od adresu fizycznego 9 * 4 = 36)
+	; odczytanie zawartoÅ›ci wektora nr 9 i zapisanie go
+	; w zmiennej 'wektor9' (wektor nr 9 zajmuje w pamiÄ™ci 4 bajty
+	; poczÄ…wszy od adresu fizycznego 9 * 4 = 36)
 	mov eax,ds:[36]						; adres fizyczny 0*16 + 36 = 36
 	mov cs:wektor9, eax
 
 	; wpisanie do wektora nr 9 adresu procedury 'obsluga_klawiatury'
-	mov ax, SEG obsluga_klawiatury			; czêœæ segmentowa adresu
+	mov ax, SEG obsluga_klawiatury			; czÄ™Å›Ä‡ segmentowa adresu
 	mov bx, OFFSET obsluga_klawiatury		; offset adresu
-	cli									; zablokowanie przerwañ
+	cli									; zablokowanie przerwaÅ„
 
 	; zapisanie adresu procedury do wektora nr 9
 	mov ds:[36], bx						; OFFSET
 	mov ds:[38], ax						; cz. segmentowa
-	sti									; odblokowanie przerwañ
+	sti									; odblokowanie przerwaÅ„
 
-	; oczekiwanie na naciœniêcie klawisza 'x'
+	; oczekiwanie na naciÅ›niÄ™cie klawisza 'x'
 aktywne_oczekiwanie:
 	
 	; sprawdzenie x i y
@@ -238,21 +234,21 @@ aktywne_oczekiwanie:
 	jmp aktywne_oczekiwanie				; skok, gdy inny znak
 
 koniec_gry:	
-	; deinstalacja procedury obs³ugi przerwania zegarowego
-	; odtworzenie oryginalnej zawartoœci wektora nr 8
+	; deinstalacja procedury obsÅ‚ugi przerwania zegarowego
+	; odtworzenie oryginalnej zawartoÅ›ci wektora nr 8
 	mov eax, cs:wektor8
 	cli
-	mov ds:[32], eax					; przes³anie wartoœci oryginalnej do wektora 8 w tablicy wektorów przerwañ
+	mov ds:[32], eax					; przesÅ‚anie wartoÅ›ci oryginalnej do wektora 8 w tablicy wektorÃ³w przerwaÅ„
 	sti
 
-	; deinstalacja procedury obs³ugi przerwania zegarowego
-	; odtworzenie oryginalnej zawartoœci wektora nr 9
+	; deinstalacja procedury obsÅ‚ugi przerwania zegarowego
+	; odtworzenie oryginalnej zawartoÅ›ci wektora nr 9
 	mov eax, cs:wektor9
 	cli
-	mov ds:[36], eax					; przes³anie wartoœci oryginalnej do wektora 9 w tablicy wektorów przerwañ
+	mov ds:[36], eax					; przesÅ‚anie wartoÅ›ci oryginalnej do wektora 9 w tablicy wektorÃ³w przerwaÅ„
 	sti
 	
-	; zakoñczenie programu
+	; zakoÅ„czenie programu
 	mov al, 0
 	mov ah, 4CH
 	int 21H
